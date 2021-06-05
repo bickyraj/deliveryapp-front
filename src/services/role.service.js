@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 import { API_URL } from '../helpers/constants';
 import httpClient from '../utils/httpClient';
 

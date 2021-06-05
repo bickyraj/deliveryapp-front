@@ -4,6 +4,17 @@ import httpClient from '../utils/httpClient';
 import {Modal} from '../components/Modal';
 import { connect } from "react-redux";
 import { remove } from "../actions/role";
+import { useToasts } from 'react-toast-notifications';
+import { capitalize } from '../utils/util';
+import { withAlert } from 'react-alert'
+import { compose } from 'redux'
+
+function withToast(Component) {
+  return function WrappedComponent(props) {
+    const toastFuncs = useToasts()
+    return <Component {...props} {...toastFuncs} />;
+  }
+}
 
 const CreateRoleForm = ({onSubmit, onChange}) => {
   return <form method="POST" onSubmit={onSubmit}>
@@ -40,41 +51,54 @@ class RolePermission extends React.Component {
 
   async onSubmit(e) {
     e.preventDefault();
-    const res = await httpClient.post(API_STORE_ROLES, this.state.roleForm).then((response) => {
-      console.log(response);
+    await httpClient.post(API_STORE_ROLES, this.state.roleForm).then((response) => {
+      this.props.addToast(response.data.message, {autoDismiss: true, appearance: 'success'});
+      this.setState({openModal: false})
+      this.getRoles();
     }).catch((error) => {
-      let res = error.error.response.data;
+      let res = error;
       console.log(res);
     });
   }
   
   async getRoles() {
-    return await httpClient.get(API_ROLES);
+    return await httpClient.get(API_ROLES).then((data) => {
+      this.setState({roles: data})
+    })
+    .catch(err => {
+      console.log('error fetching roles');
+    });
   }
 
   componentDidMount() {
-      if (!this.state.data) {
-          this.getRoles().then((data) => {
-            this.setState({roles: data})
-          })
-          .catch(err => {
-            console.log('error fetching roles');
-          });
-      }
+    if (!this.state.data) {
+        this.getRoles();
+    }
   }
 
-  renderRoleTableData() {
-    const { dispatch, history } = this.props;
+  onRemoveRole(e, role) {
+    const self = this;
+    const { dispatch, addToast, alert } = this.props;
 
-    function onRemoveRole(e, role) {
       e.preventDefault();
-      dispatch(remove(role.id)).then((response) => {
-        console.log(response);
-      }).catch((error) => {
-        console.log(error.response.data.message);
-      });
+      alert.show('Are you sure you want to delete this role?', {
+        title: 'Delete Role'.concat(" \""+capitalize(role.name)+"\""),
+        type: 'error',
+        onConfirm: () => {
+          dispatch(remove(role.id)).then(function (response) {
+            addToast(response.data.message, {autoDismiss: true, appearance: 'success'});
+            self.getRoles();
+          }).catch(function(error) {
+            addToast(error.response.data.message, {autoDismiss: true, appearance: 'error'});
+          }).finally(() => {
+            alert.removeAll()
+          });
+        }
+      })
     }
-    
+  
+
+  renderRoleTableData() {
     if (this.state.roles !== null) {
       return this.state.roles.data.data.map((role, index) => {
          const { id, name, guard_name: guard } = role //destructuring
@@ -90,7 +114,7 @@ class RolePermission extends React.Component {
                        <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                      </svg> */}
                      <p className="text-gray-500 truncate group-hover:text-gray-900">
-                       {name}
+                       {capitalize(name)}
                      </p>
                    </a>
                  </div>
@@ -103,7 +127,9 @@ class RolePermission extends React.Component {
                {/* <td className="px-6 py-4 text-right whitespace-nowrap text-sm text-gray-500">
                </td> */}
                <td className="max-w-0 w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                 <button onClick={(e) => {onRemoveRole(e, role);}}>Delete</button>
+                 <div title="remove role" className="flex hover:text-red-500 text-gray-500 truncate group-hover:text-gray-900 cursor-pointer" onClick={(e) => {this.onRemoveRole(e, role);}}>
+                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                   </div>
                </td>
              </tr>
          )
@@ -250,4 +276,8 @@ class RolePermission extends React.Component {
 }
 
 
-export default connect()(RolePermission);
+export default compose(
+  withToast,
+  withAlert(),
+  connect()
+)(RolePermission)

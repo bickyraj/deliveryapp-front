@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom';
+import { Router, Route, Redirect, Switch } from 'react-router-dom';
 import { connect } from "react-redux";
 
 /** Layouts **/  
@@ -15,7 +15,22 @@ import Blog from './admin/blogs';
 import Setting from './admin/settings';
 import PrivateRoute from './PrivateRoute';
 import RolePermission from './admin/roles_and_permissions';
-import { ToastProvider, useToasts } from 'react-toast-notifications';
+import Orders from './admin/order/index';
+import NewOrder from './admin/order/new_order';
+import { ToastProvider } from 'react-toast-notifications';
+import {default as AlertTemplate} from './components/Alert';
+import { transitions, positions, Provider as AlertProvider } from 'react-alert'
+
+// optional configuration
+const options = {
+  // you can also just use 'bottom center'
+  position: positions.TOP_RIGHT,
+  containerStyle: {
+    top: '0px',
+    display: 'inherit'
+  },
+  transition: transitions.FADE
+}
 
 class App extends Component {
   constructor(props) {
@@ -29,20 +44,26 @@ class App extends Component {
 
     return (  
         <div>
-          <Router>  
+          <Router history={history}>  
             <Switch>  
               {/* <Route exact path="/">  
                 <Redirect to="/layout1" />  
               </Route>   */}
               <LoginLayoutRoute path="/login" component={LoginPage} />  
               {/* <DashboardLayoutRoute path="/admin" component={Dashboard} /> */}
-              <DashboardLayout>
-                <PrivateRoute exact isLoggedIn={isLoggedIn} path="/" component={Dashboard}/>
-                <PrivateRoute exact isLoggedIn={isLoggedIn} path="/admin" component={Dashboard}/>
-                <PrivateRoute exact isLoggedIn={isLoggedIn} path="/admin/blogs" component={Blog}/>
-                <PrivateRoute exact isLoggedIn={isLoggedIn} path="/admin/settings" component={Setting}/>
-                <PrivateRoute exact isLoggedIn={isLoggedIn} path="/admin/roles-and-permissions" component={RolePermission}/>
-              </DashboardLayout>
+                <ToastProvider>
+                  <AlertProvider template={AlertTemplate} {...options}>
+                    <DashboardLayout>
+                      <PrivateRoute exact isLoggedIn={isLoggedIn} path="/" component={Dashboard}/>
+                      <PrivateRoute exact isLoggedIn={isLoggedIn} path="/admin" component={Dashboard}/>
+                      <PrivateRoute exact isLoggedIn={isLoggedIn} path="/admin/blogs" component={Blog}/>
+                      <PrivateRoute exact isLoggedIn={isLoggedIn} path="/admin/settings" component={Setting}/>
+                      <PrivateRoute exact isLoggedIn={isLoggedIn} path="/admin/roles-and-permissions" component={RolePermission}/>
+                      <PrivateRoute exact isLoggedIn={isLoggedIn} path="/admin/orders" component={Orders}/>
+                      <PrivateRoute exact isLoggedIn={isLoggedIn} path="/admin/orders/new" component={NewOrder}/>
+                    </DashboardLayout>
+                  </AlertProvider>
+                </ToastProvider>
             </Switch>  
           </Router>  
         </div>

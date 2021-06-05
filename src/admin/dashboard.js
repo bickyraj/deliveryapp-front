@@ -107,7 +107,7 @@ class Dashboard extends Component {
           <div className="shadow sm:hidden">
             <ul className="mt-2 divide-y divide-cool-gray-200 overflow-hidden shadow sm:hidden">
               <li>
-                <a href="#" className="block px-4 py-4 bg-white hover:bg-cool-gray-50">
+                <a href="{#}" className="block px-4 py-4 bg-white hover:bg-cool-gray-50">
                   <div className="flex items-center space-x-4">
                     <div className="flex-1 flex space-x-2 truncate">
                       {/* <!-- Heroicon name: cash --> */}
