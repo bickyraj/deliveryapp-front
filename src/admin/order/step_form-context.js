@@ -6,7 +6,8 @@ export const stepForm = {
         full_name: "",
         email: "",
         mobile: "",
-        address: ""
+        address: "",
+        delivery_date: ""
     },
     itemList: [],
     setStep: (step) => {},

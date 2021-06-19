@@ -7,7 +7,7 @@ class CustomerDetailForm extends React.Component {
         super(props, context);
         this.state = {
             form_valid: () => {
-                if (this.state.form.full_name !== "" && this.state.form.mobile !== "" && this.state.form.address !== "") {
+                if (this.state.form.full_name !== "" && this.state.form.mobile !== "" && this.state.form.address !== "" && this.state.form.delivery_date) {
                     return true;
                 }
                 return false;
@@ -19,7 +19,8 @@ class CustomerDetailForm extends React.Component {
                     full_name: "",
                     email: "",
                     mobile: "",
-                    address: ""
+                    address: "",
+                    delivery_date: ""
                 }
         };
 
@@ -116,6 +117,20 @@ class CustomerDetailForm extends React.Component {
                                                         value={this.state.form.address}
                                                         onChange={this.handleChange}
                                                         autoComplete="address"
+                                                        className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
+                                                </div>
+
+                                                <div className="col-span-6 sm:col-span-3">
+                                                    <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+                                                        Delivery Date *
+                                                    </label>
+                                                    <input
+                                                        type="date"
+                                                        name="delivery_date"
+                                                        id="delivery_date"
+                                                        value={this.state.form.delivery_date}
+                                                        onChange={this.handleChange}
+                                                        autoComplete="date"
                                                         className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"/>
                                                 </div>
                                             </div>
