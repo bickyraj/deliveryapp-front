@@ -1,6 +1,3 @@
-import React, { Component } from 'react';  
-import { Route } from 'react-router-dom';
-
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import { connect } from "react-redux";

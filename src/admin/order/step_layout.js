@@ -23,7 +23,7 @@ class StepLayout extends React.Component {
                                 <div className="pt-6 divide-y divide-gray-200">
                                     <div className="">
                                         <div>
-                                            <h2 className="mb-3 text-lg leading-6 font-medium text-gray-900">#New Order</h2>
+                                            {/* <h2 className="mb-3 text-lg leading-6 font-medium text-gray-900">New Order</h2> */}
                                             {/* <p className="mt-1 text-sm text-gray-500">
                                             Ornare eu a volutpat eget vulputate. Fringilla commodo amet.
                                             </p> */}
