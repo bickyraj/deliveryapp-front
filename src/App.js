@@ -19,6 +19,8 @@ import Orders from './admin/order/index';
 import NewOrder from './admin/order/new_order';
 import Carriers from './admin/carrier/index';
 import NewCarrier from './admin/carrier/add';
+import Vendors from './admin/vendor/index';
+import NewVendor from './admin/vendor/add';
 import { ToastProvider } from 'react-toast-notifications';
 import {default as AlertTemplate} from './components/Alert';
 import { transitions, positions, Provider as AlertProvider } from 'react-alert'
@@ -65,6 +67,8 @@ class App extends Component {
                       <PrivateRoute exact isLoggedIn={isLoggedIn} path="/admin/orders/new" component={NewOrder}/>
                       <PrivateRoute exact isLoggedIn={isLoggedIn} path="/admin/carriers" component={Carriers}/>
                       <PrivateRoute exact isLoggedIn={isLoggedIn} path="/admin/carriers/new" component={NewCarrier}/>
+                      <PrivateRoute exact isLoggedIn={isLoggedIn} path="/admin/vendors" component={Vendors}/>
+                      <PrivateRoute exact isLoggedIn={isLoggedIn} path="/admin/vendors/new" component={NewVendor}/>
                     </DashboardLayout>
                   </AlertProvider>
                 </ToastProvider>

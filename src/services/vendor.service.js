@@ -1,10 +1,10 @@
 import { API_URL } from '../helpers/constants';
 import httpClient from '../utils/httpClient';
 
-class CarrierService {
+class VendorService {
     async create(data) {
         return await httpClient.post(API_URL + 'admin/vendors', data);
     }
 }
 
-export default new CarrierService();
+export default new VendorService();
