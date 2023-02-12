@@ -8,8 +8,15 @@ class Login extends Component {
     super(props)
 
     this.state = {
-      email: '',
-      password: ''
+        formFields: {
+            email: '',
+            password: '',
+        },
+        isValid: false,
+        errors: {
+            email: "",
+            password: "",
+        },
     }
 
     this.onChange = this.onChange.bind(this)
@@ -17,26 +24,68 @@ class Login extends Component {
   }
 
   onChange(e) {
-    this.setState({ [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    this.setState((prevState) => ({
+      formFields: {
+        ...prevState.formFields,
+        [name]: value
+      }
+    }));
   }
 
-  onSubmit(e) {
-    e.preventDefault();
-    const { dispatch, history } = this.props;
-    dispatch(login(this.state.email, this.state.password))
-    .then(() => {
-      history.push("/admin");
-      // window.location.reload();
-    })
-    .catch(() => {
-      this.setState({
-        loading: false
-      });
+  validateForm(form) {
+    const errors = {
+      password: "",
+      email: "",
+    };
+
+    if (!form.password) {
+      errors.password = "Password is required.";
+    }
+
+    if (!form.email) {
+      errors.email = "Email is required.";
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(form.email)) {
+      errors.email = "Invalid email address.";
+    }
+   
+    this.setState({'isValid': Object.values(errors).every(v => { return v === '' })});
+    return errors;
+  }
+
+  isFormValid() {
+    return new Promise((resolve, reject) => {
+        this.setState({
+          errors: {
+            ...this.validateForm(this.state.formFields)
+          }
+        });
+        resolve(true);
     });
+  }
+
+  async onSubmit(e) {
+    e.preventDefault();
+    await this.isFormValid();
+    if (this.state.isValid) {
+        const { dispatch, history } = this.props;
+        const {email, password } = this.state.formFields;
+        dispatch(login(email, password))
+        .then(() => {
+          history.push("/admin");
+          // window.location.reload();
+        })
+        .catch(() => {
+          this.setState({
+            loading: false
+          });
+        });
+    }
   }
   
   render() {
     const { isLoggedIn } = this.props;
+    const { email, password } = this.state.formFields;
 
     if (isLoggedIn) {
       return <Redirect to="/admin" />;
@@ -47,20 +96,20 @@ class Login extends Component {
             <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
               <div className="mx-auto w-full max-w-sm lg:w-96">
                 <div>
-                  <img className="h-12 w-auto" src="https://tailwindui.com/img/logos/v1/workflow-mark-on-white.svg" alt="Workflow" />
+                  {/* <img className="h-12 w-auto" src="https://tailwindui.com/img/logos/v1/workflow-mark-on-white.svg" alt="Workflow" /> */}
                   <h2 className="mt-6 text-3xl leading-9 font-extrabold text-gray-900">
                     Sign in to your account
                   </h2>
-                  <p className="mt-2 text-sm leading-5 text-gray-600 max-w">
+                  {/* <p className="mt-2 text-sm leading-5 text-gray-600 max-w">
                     Or
-                    <a href="void()" className="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">
+                    <a href="void()" className="font-medium text-cyan-600 ml-1 hover:text-cyan-500 focus:outline-none focus:underline transition ease-in-out duration-150">
                       start your 14-day free trial
                     </a>
-                  </p>
+                  </p> */}
                 </div>
 
                 <div className="mt-8">
-                  <div>
+                  {/* <div>
                     <div>
                       <p className="text-sm leading-5 font-medium text-gray-700">
                         Sign in with
@@ -109,7 +158,7 @@ class Login extends Component {
                         </span>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="mt-6">
                     <form onSubmit={this.onSubmit} className="space-y-6">
@@ -118,7 +167,8 @@ class Login extends Component {
                           Email address
                         </label>
                         <div className="mt-1 rounded-md shadow-sm">
-                          <input id="email" name="email" type="email" value={this.state.email} onChange={this.onChange} required className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                          <input id="email" name="email" type="email" value={email} onChange={this.onChange} className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                          {this.state.errors.email && <div className="text-red-500 text-sm">{this.state.errors.email}</div>}
                         </div>
                       </div>
 
@@ -127,20 +177,21 @@ class Login extends Component {
                           Password
                         </label>
                         <div className="mt-1 rounded-md shadow-sm">
-                          <input id="password" type="password" name="password" value={this.state.password} onChange={this.onChange} required className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                          <input id="password" type="password" name="password" value={password} onChange={this.onChange} className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                          {this.state.errors.password && <div className="text-red-500 text-sm">{this.state.errors.password}</div>}
                         </div>
                       </div>
 
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
-                          <input id="remember_me" type="checkbox" className="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out" />
+                          <input id="remember_me" type="checkbox" className="form-checkbox h-4 w-4 text-cyan-600 transition duration-150 ease-in-out" />
                           <label htmlFor="remember_me" className="ml-2 block text-sm leading-5 text-gray-900">
                             Remember me
                           </label>
                         </div>
 
                         <div className="text-sm leading-5">
-                          <a href="#top" className="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">
+                          <a href="#top" className="font-medium text-cyan-600 hover:text-cyan-500 focus:outline-none focus:underline transition ease-in-out duration-150">
                             Forgot your password?
                           </a>
                         </div>
@@ -148,7 +199,7 @@ class Login extends Component {
 
                       <div>
                         <span className="block w-full rounded-md shadow-sm">
-                          <button type="submit" className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
+                          <button type="submit" className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-500 focus:outline-none focus:border-cyan-700 focus:shadow-outline-cyan active:bg-cyan-700 transition duration-150 ease-in-out">
                             Sign in
                           </button>
                         </span>
